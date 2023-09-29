@@ -24,9 +24,10 @@ io.use((socket, next) => {
     socket.username = username
     next()
 })
+
 io.on('connection', (socket) => {
     console.log(`connect: ${socket.id}`)
-    
+
     const users = []
     for (let [ id, socket ] of io.of('/').sockets) {
         users.push({
@@ -34,19 +35,33 @@ io.on('connection', (socket) => {
             username: socket.username
         })
     }
-    
     socket.emit('users', users)
+    
+
     socket.broadcast.emit('user connected', {
         userId: socket.id,
         username: socket.username
     })
 
-    socket.onAny((event, ...args) => {
-        console.log("any" + event)
+    // Uncomment to listen to any event (custom named!)
+    // socket.onAny((event, ...args) => {
+    //     console.log("any " + event)
+    // })
+
+    
+
+    socket.on('private message', ({ message, to }) => {
+        socket.to(to).emit('private message', {
+            message,
+            from: socket.id
+        })
+        console.log('private message from ' + socket.id + ' to ' + to)
+        console.log('message: ' + message)
     })
 
     socket.on('disconnect', () => {
         console.log('disconnecting')
+        socket.broadcast.emit('user disconnected', socket.id)
     })
 })
 

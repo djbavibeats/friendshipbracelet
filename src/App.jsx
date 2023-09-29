@@ -11,7 +11,7 @@ import Chatroom from './components/chatroom'
 function App() {
   return (
     <>
-      <div className="m-auto flex justify-center p-16 min-h-screen">
+      <div>
         <Chatroom />
       </div>
     </>
