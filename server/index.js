@@ -57,7 +57,7 @@ io.on('connection', (socket) => {
     })
 })
 
-app.get('/api', (req, res) => {
+app.get('/api/v1/hello', (req, res) => {
     res.json({
         message: 'Hi!!!'
     })

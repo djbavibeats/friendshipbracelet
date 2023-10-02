@@ -42,7 +42,9 @@ function App() {
           <Loading />
         }
         { screen === 'bracelet' &&
+        <div className="h-[90%] max-w-lg m-auto">
           <Bracelet />
+        </div>
         }
       </div>
     </>

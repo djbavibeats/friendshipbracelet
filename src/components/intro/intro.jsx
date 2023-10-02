@@ -4,7 +4,12 @@ import { faSpotify } from '@fortawesome/free-brands-svg-icons'
 export default function Intro({ screen, handleScreenChange }) {
 
     const handleSpotifyClick = () => {
-        handleScreenChange('bracelet')
+        fetch('/api/v1/hello')
+            .then((r) => r.json())
+            .then(data => {
+                console.log(data)
+            })
+        // handleScreenChange('bracelet')
     }
 
     const handleEmailClick = () => {

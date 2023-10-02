@@ -13,7 +13,7 @@ export default function FriendshipBracelet(props) {
         <OrbitControls />
         <directionalLight />
         <ambientLight intensity={ 0.5 } />
-        <group ref={ bracelet } {...props} dispose={null} scale={ 1 } rotation-x={ .125 }>
+        <group ref={ bracelet } {...props} dispose={null} scale={ 1.4 } rotation-x={ .125 }>
             <mesh
                 castShadow
                 receiveShadow
