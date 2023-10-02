@@ -4,7 +4,7 @@ import { faSpotify } from '@fortawesome/free-brands-svg-icons'
 export default function Intro({ screen, handleScreenChange }) {
 
     const handleSpotifyClick = () => {
-        fetch('/test')
+        fetch('/message')
             .then(res => res.json())
             .then(data => {
                 console.log(data)
