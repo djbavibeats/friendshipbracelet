@@ -1,9 +1,11 @@
 import express from 'express'
+import ViteExpress from 'vite-express'
 import { createServer } from 'node:http'
 import { Server } from 'socket.io'
 import cors from 'cors'
 
 const app = express()
+ViteExpress.config({ mode: 'production' })
 const PORT = 5000
 const server = createServer(app)
 const io = new Server(server, {
@@ -63,6 +65,10 @@ app.get('/api/v1/hello', (req, res) => {
     })
 })
 
-server.listen(PORT, () => {
-    console.log('listening... on PORT: ' + PORT)
+ViteExpress.listen(server, 5000, () => {
+    console.log('server is listening')
 })
+
+// server.listen(PORT, () => {
+//     console.log('listening... on PORT: ' + PORT)
+// })
