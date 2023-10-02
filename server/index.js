@@ -7,7 +7,10 @@ import cors from 'cors'
 const app = express()
 ViteExpress.config({ mode: 'production' })
 
-app.get('/test', (_, res) => res.send('hello from the server!'))
+app.get('/test', (_, res) => {
+    console.log('HEY')
+    res.send('hello from the server!')
+})
 
 ViteExpress.listen(app, 5000, () => {
     console.log('server is listening')
