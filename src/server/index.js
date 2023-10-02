@@ -5,16 +5,13 @@ import { Server } from 'socket.io'
 import cors from 'cors'
 
 const app = express()
+const PORT = 5500
 ViteExpress.config({ mode: 'production' })
 
-app.get('/test', (_, res) => {
-    console.log('HEY')
-    res.send('hello from the server!')
-})
+app.get("/message", (_, res) => res.send("Hello from express!"))
 
-ViteExpress.listen(app, 5000, () => {
-    console.log('server is listening')
-})
+ViteExpress.listen(app, PORT, () => console.log("Server is listening..." + PORT))
+
 // const server = createServer(app)
 // const io = new Server(server, {
 //     cors: {
