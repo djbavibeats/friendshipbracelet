@@ -8,7 +8,11 @@ const app = express()
 const PORT = 5500
 ViteExpress.config({ mode: 'production' })
 
-app.get("/message", (_, res) => res.send("Hello from express!"))
+app.get("/message", (_, res) => {
+    console.log('hey')
+    res.json({ 'message': 'oh shit!' })
+    res.send("Hello from express!")
+})
 
 ViteExpress.listen(app, PORT, () => console.log("Server is listening..." + PORT))
 
