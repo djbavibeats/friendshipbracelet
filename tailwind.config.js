@@ -5,7 +5,17 @@ export default {
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
-    extend: {},
+    fontFamily: {
+      sans: ['Swiss721' ]
+    },
+    extend: {
+      fontFamily: {
+        eurostile: 'Eurostile'
+      },
+      colors: {
+        chasered: '#D53148'
+      }
+    },
   },
   plugins: [],
 }

@@ -9,28 +9,37 @@ export default function Chatroom() {
     const [ pairedUser, setPairedUser ] = useState(null)
 
     const messageRef = useRef(null)
+    const [ messageBody, setMessageBody ] = useState('')
 
     useEffect(() => {       
         socket.on('connect', () => {
-            setIsConnected(true)
+            users.forEach((user) => {
+                if (user.self) {
+                    user.connected = true
+                    setIsConnected(true)
+                }
+            })
         })
 
         socket.on('disconnect', () => {
-            setIsConnected(false)
+            users.forEach((user) => {
+                if (user.self) {
+                    user.connected = false
+                    setIsConnected(false)
+                }
+            })
         })
 
-        socket.on('user connected', (user) => {
-            setUsers(
-                [ 
-                    ...users,
-                    user
-                ]
-            )
-        })
+        const initReactiveProperties = (user) => {
+            user.connected = true
+            user.messages = []
+            user.hasNewMessages = false
+        }
 
         socket.on('users', (users) => {
             users.forEach((user) => {
                 user.self = user.userId === socket.id
+                initReactiveProperties(user)
             })
 
             const sortedUsers = users.sort((a, b) => {
@@ -43,8 +52,30 @@ export default function Chatroom() {
             setUsers(sortedUsers)
         })
 
+        socket.on('user connected', (user) => {
+            initReactiveProperties(user)
+            setUsers(
+                [ 
+                    ...users,
+                    user
+                ]
+            )
+            console.log('updated users: ', users)
+        })
+
+        socket.on('user disconnected', (id) => {
+            const updatedUsers = users
+            for (let i = 0; i < updatedUsers.length; i++) {
+                const user = users[i]
+                if (user.userId === id) {
+                    user.connected = false
+                    break
+                }
+            }
+            setUsers(updatedUsers)
+        })
+
         socket.on('private message', ({ message, from }) => {
-            alert('new private message: ' + message)
             for (let i = 0; i < users.length; i++) {
                 const user = users[i]
                 if (user.userId === from) {
@@ -57,12 +88,12 @@ export default function Chatroom() {
                     }
                     break
                 }
-            }
+            }  
+            setMessageBody(message)
         })
 
         socket.on('connect_error', (err) => {
             if (err.message === 'invalid username') {
-                console.log('invalid username')
                 setUsernameSelected(false)
             }
         })
@@ -70,7 +101,11 @@ export default function Chatroom() {
         return () => {
             socket.off('connect')
             socket.off('disconnect')
+            socket.off('users')
+            socket.off('user connected')
+            socket.off('user disconnected')
             socket.off('connect_error')
+
         }
     }, [ users ])
 
@@ -84,26 +119,28 @@ export default function Chatroom() {
 
     function handleSelfClick(user) {
         setPairedUser(null)
-        console.log('that is you!')
     }
 
-    function handleUserClick(user) {
-        setPairedUser(user)
-
+    // Select User
+    function handleUserClick(selecteduser) {
+        setPairedUser(selecteduser)
+        selecteduser.hasNewMessages = false
     }
 
+    // On Message
     function sendMessage() {
         if (pairedUser) {
-            const updatedPairedUser = pairedUser
             socket.emit('private message', {
                 message: messageRef.current.value,
                 to: pairedUser.userId
             })
-            updatedPairedUser.messages.push({
+            pairedUser.messages.push({
                 message: messageRef.current.value,
                 fromSelf: true
             })
-            setPairedUser(updatedPairedUser)
+            setMessageBody(messageRef.current.value)
+            messageRef.current.value = ""
+            // setPairedUser(updatedPairedUser)
         }
     }
 
@@ -156,6 +193,19 @@ export default function Chatroom() {
                     <>
                         <div>
                             <p>Chatroom with { pairedUser.username }</p>
+                        </div>
+                        <div>
+                            <ul className="message">
+                                { 
+                                    pairedUser.messages.map((message, index) => {
+                                        if (message.fromSelf) {
+                                            return <li key={ index }>(yourself) : { message.message }</li>
+                                        } else {
+                                            return <li key={ index }>{ pairedUser.username } : { message.message }</li>
+                                        }
+                                    })
+                                }
+                            </ul>
                         </div>
                         <div>
                             <input type="textarea" className="border-2 w-full p-2 mb-2" ref={ messageRef } />

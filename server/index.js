@@ -1,7 +1,6 @@
 import express from 'express'
 import { createServer } from 'node:http'
 import { Server } from 'socket.io'
-
 import cors from 'cors'
 
 const app = express()
@@ -13,8 +12,6 @@ const io = new Server(server, {
     }
 })
 app.use(cors())
-
-let users = []
 
 io.use((socket, next) => {
     const username = socket.handshake.auth.username
@@ -40,7 +37,7 @@ io.on('connection', (socket) => {
 
     socket.broadcast.emit('user connected', {
         userId: socket.id,
-        username: socket.username
+        username: socket.username,
     })
 
     // Uncomment to listen to any event (custom named!)
@@ -48,19 +45,14 @@ io.on('connection', (socket) => {
     //     console.log("any " + event)
     // })
 
-    
-
     socket.on('private message', ({ message, to }) => {
         socket.to(to).emit('private message', {
             message,
             from: socket.id
         })
-        console.log('private message from ' + socket.id + ' to ' + to)
-        console.log('message: ' + message)
     })
 
     socket.on('disconnect', () => {
-        console.log('disconnecting')
         socket.broadcast.emit('user disconnected', socket.id)
     })
 })
@@ -70,8 +62,6 @@ app.get('/api', (req, res) => {
         message: 'Hi!!!'
     })
 })
-
-
 
 server.listen(PORT, () => {
     console.log('listening... on PORT: ' + PORT)
